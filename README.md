@@ -10,7 +10,9 @@ is a single, self-contained `index.html` with no build step.
 - **Session timeline** — a date strip across the top. The latest session loads by default; new
   sessions appear as they are added.
 - **Now playing** — the session's recording as a featured player card, with date, host, time and
-  a summary. Clicking opens the recording in SharePoint (sign-in required).
+  a summary. Click to play **inline** via the Microsoft Stream embed. Inline playback requires an
+  Infor sign-in and works when the page is viewed inside Infor; in a shared preview (or the public
+  Claude artifact) the embed is blocked by the sandbox, so use the "Open in SharePoint" fallback.
 - **Chapters** — a horizontal playlist of clip cards, one per topic covered. Each clip opens the
   full recording in SharePoint.
 - **Shared on this day** — a resource library of every file posted for the session, grouped
@@ -46,7 +48,10 @@ To publish a new session, append one object to that array:
   folderUrl: SP_ROOT + "/12-Oct-2026",
   summary: "…",
   recordings: [
-    { title: "…", kind: "MP4 · …", dur: "≈ 60 min", url: "<SharePoint recording link>" }
+    // `url` is the Microsoft Stream player link. It drives the inline player AND the
+    // "Open in SharePoint" button. Build it from the recording's server-relative path:
+    //   https://inforonline.sharepoint.com/sites/Infor_Velocity_Suite_Usecase2/_layouts/15/stream.aspx?id=<URL-encoded server-relative .mp4 path>&referrer=StreamWebApp.Web&referrerScenario=AddressBarCopied.view
+    { title: "…", kind: "MP4 · …", dur: "≈ 60 min", url: "<Stream player link>" }
   ],
   topics: [ { tag: "…", title: "…", who: "…", desc: "…" } ],
   library: [
