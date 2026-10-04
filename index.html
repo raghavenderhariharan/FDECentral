@@ -305,6 +305,38 @@ footer{border-top:1px solid var(--line);margin-top:20px}
 .foot-in a{color:var(--fg-2)}
 .foot-in .note{font-family:var(--mono);max-width:52ch;line-height:1.6}
 
+/* ---- decisions grid ---- */
+.decgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px 30px}
+
+/* ---- document preview modal ---- */
+.modal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px))}
+.modal-backdrop{position:absolute;inset:0;background:rgba(6,9,14,.66);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.modal-card{position:relative;width:min(960px,100%);height:min(86vh,820px);display:flex;flex-direction:column;
+  background:var(--surface);border:1px solid var(--line-2);border-radius:16px;overflow:hidden;box-shadow:0 40px 90px -30px rgba(0,0,0,.7)}
+@media (prefers-reduced-motion:no-preference){.modal-card{animation:pop .22s ease}}
+.modal-head{display:flex;align-items:center;gap:11px;padding:11px 13px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.modal-head .badge{width:36px;height:36px;flex:none;font-size:10px}
+.modal-head .mt{min-width:0;display:flex;flex-direction:column}
+.modal-head .mt b{font-family:var(--display);font-weight:600;font-size:14px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44vw}
+.modal-head .mt span{font-family:var(--mono);font-size:10.5px;color:var(--fg-3);letter-spacing:.04em;text-transform:uppercase}
+.modal-head .msp{flex:1}
+.modal-body{flex:1;min-height:0;background:var(--bg-2);position:relative}
+.docframe{width:100%;height:100%;border:0;background:#fff}
+.noview{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:30px;color:var(--fg-2)}
+.noview svg{width:46px;height:46px;color:var(--fg-3)}
+.noview p{margin:0;font-size:14px}
+.noview .sub{font-size:12.5px;color:var(--fg-3);max-width:42ch}
+.modal-foot{margin:0;padding:9px 14px;font-size:11.5px;color:var(--fg-3);border-top:1px solid var(--line);background:var(--surface-2);line-height:1.5}
+.modal-foot:empty{display:none}
+.modal-foot b{color:var(--fg-2);font-weight:600}
+@keyframes pop{from{transform:translateY(10px) scale(.985);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:560px){
+  .modal-head .mt b{max-width:34vw}
+  .modal-head #mOpen span,.modal-head #mDownload span{display:none}
+  .modal-card{height:90vh}
+}
+
 /* ---- reveal animation ---- */
 html.js .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
 html.js .reveal.in{opacity:1;transform:none}
@@ -383,19 +415,32 @@ html.js .reveal.in{opacity:1;transform:none}
   </section>
 
   <section class="block reveal" id="outcomes">
-    <div class="shead"><h2>Decisions &amp; follow-ups</h2></div>
-    <div class="twocol">
-      <div class="panel">
-        <h3><span class="dot"></span>Decisions</h3>
-        <ul class="declist" id="decisions"></ul>
-      </div>
-      <div class="panel">
-        <h3><span class="dot" style="background:var(--accent-2)"></span>Follow-ups</h3>
-        <div class="fu" id="followups"></div>
-      </div>
+    <div class="shead"><h2>Decisions</h2><p class="lede">What the group agreed in this session.</p></div>
+    <div class="panel">
+      <ul class="declist decgrid" id="decisions"></ul>
     </div>
   </section>
 </main>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="modal-head">
+      <span class="badge" id="mBadge"></span>
+      <div class="mt"><b id="mTitle"></b><span id="mKind"></span></div>
+      <span class="msp"></span>
+      <a class="hbtn" id="mDownload" target="_blank" rel="noopener" title="Download the file">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg><span>Download</span></a>
+      <a class="hbtn" id="mOpen" target="_blank" rel="noopener" title="Open in SharePoint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg><span>Open</span></a>
+      <button class="hbtn icon-btn" id="mClose" aria-label="Close preview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+    <p class="modal-foot" id="mFoot"></p>
+  </div>
+</div>
 
 <footer>
   <div class="wrap foot-in">
@@ -434,8 +479,8 @@ var DATA = {
           { title:"FDE Central Biweekly Connect — Full Recording",
             kind:"MP4 · ≈203 MB · Microsoft Teams",
             dur:"≈ 60 min",
-            // Microsoft Stream player link (used for inline playback + Open in SharePoint)
-            url:"https://inforonline.sharepoint.com/sites/Infor_Velocity_Suite_Usecase2/_layouts/15/stream.aspx?id=%2Fsites%2FInfor%5FVelocity%5FSuite%5FUsecase2%2FShared%20Documents%2FFDE%5FInfor%5FVelocity%5FSuite%2FFDE%2D%20Infor%20Velocity%20Suite%2FFDE%20Central%20Biweekly%20Connect%2F28%2DSep%2D2026%2FFDE%20Central%20Biweekly%20Connect%2D20260928%5F180244%2DMeeting%20Recording%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E4f98fc1c%2Df338%2D4959%2D9f23%2De387065504a0" }
+            // Microsoft Stream shareable link (drives inline playback + Open in SharePoint)
+            url:"https://inforonline.sharepoint.com/:v:/s/Infor_Velocity_Suite_Usecase2/IQBWK0ZGb2-_TpzYv8YT6CLSAYm_Qv6OK14iap5MFF5RWEc?e=8uitVz&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D" }
         ],
         topics:[
           {tag:"Field enablement", title:"FDE Architects Session — Atlanta", who:"Raghavender Hariharan",
@@ -518,7 +563,11 @@ var DATA = {
       eml:"Email thread",msg:"Email thread",html:"Web page",htm:"Web page",pdf:"PDF",mp4:"Recording",mov:"Recording"};
     return map[ext]||(ext?ext.toUpperCase()+" file":"File");
   }
-  function pillClass(s){s=s.toLowerCase();if(s==="planned")return "planned";if(s==="open")return "open";if(s==="ongoing")return "ongoing";return "progress";}
+  function previewUrl(open,ext){
+    if(ext==="docx"||ext==="doc"||ext==="pptx"||ext==="ppt"||ext==="xlsx"||ext==="xls") return open+"?action=embedview";
+    if(ext==="pdf"||ext==="html"||ext==="htm") return open; // rendered directly by the browser / SharePoint
+    return ""; // eml, msg and others have no inline viewer
+  }
 
   var groupIcons={
     doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>',
@@ -631,7 +680,10 @@ var DATA = {
       var files=g.items.map(function(it){
         var ext=extOf(it.name);
         var label=ext?ext.toUpperCase():"FILE";
-        return '<a class="file" href="'+esc(fileUrl(g.folderUrl,it.name))+'" target="_blank" rel="noopener">'
+        var open=fileUrl(g.folderUrl,it.name);
+        return '<a class="file" href="'+esc(open)+'" target="_blank" rel="noopener"'
+          +' data-name="'+esc(it.name)+'" data-ext="'+esc(ext)+'" data-kind="'+esc(kindLabel(ext))+'" data-badge="'+esc(badgeClass(ext))+'"'
+          +' data-open="'+esc(open)+'" data-download="'+esc(open+"?download=1")+'" data-preview="'+esc(previewUrl(open,ext))+'">'
           +'<span class="badge badge--'+badgeClass(ext)+'">'+esc(label)+'</span>'
           +'<span class="fmeta"><span class="fname">'+esc(it.name)+'</span><span class="fkind">'+esc(kindLabel(ext))+'</span></span>'
           +'<span class="arrow">'+extLink+'</span></a>';
@@ -644,15 +696,18 @@ var DATA = {
     }).join("");
     $("#library").innerHTML=html;
     $("#sharedLede").textContent="Everything posted for the "+s.dateLabel+" session — "+countFiles(s)+" files across "+s.library.length+" groups.";
+    Array.prototype.forEach.call($("#library").querySelectorAll(".file"),function(a){
+      a.addEventListener("click",function(e){
+        if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button===1)return; // let modified clicks open normally
+        e.preventDefault();
+        openDoc(a.dataset);
+      });
+    });
   }
 
   function renderOutcomes(s){
     var tick='<span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>';
     $("#decisions").innerHTML=s.decisions.map(function(d){return '<li>'+tick+'<span>'+esc(d)+'</span></li>';}).join("");
-    $("#followups").innerHTML=s.followups.map(function(f){
-      return '<div class="fuitem"><div class="txt"><b>'+esc(f.text)+'</b><span>'+esc(f.owner)+'</span></div>'
-        +'<span class="pill '+pillClass(f.status)+'">'+esc(f.status)+'</span></div>';
-    }).join("");
   }
 
   function select(i){
@@ -684,6 +739,52 @@ var DATA = {
     try{localStorage.setItem("fdehub-theme",next);}catch(e){}
     paintBtn();
   });
+
+  /* document preview modal */
+  var modal=$("#modal"), mBody=$("#mBody"), lastFocus=null, dlFrame=null;
+  function closeDoc(){
+    if(modal.hidden)return;
+    modal.hidden=true;
+    mBody.innerHTML="";               // stop any loaded iframe
+    try{document.body.style.overflow="";}catch(e){}
+    if(lastFocus&&lastFocus.focus){try{lastFocus.focus();}catch(e){}}
+  }
+  function openDoc(d){
+    lastFocus=document.activeElement;
+    var ext=(d.ext||"").toUpperCase();
+    var badge=$("#mBadge"); badge.className="badge badge--"+(d.badge||"other"); badge.textContent=ext||"FILE";
+    $("#mTitle").textContent=d.name||"Document"; $("#mTitle").title=d.name||"";
+    $("#mKind").textContent=d.kind||"";
+    $("#mOpen").href=d.open||"#";
+    $("#mDownload").href=d.download||"#";
+    if(d.preview){
+      var f=document.createElement("iframe");
+      f.className="docframe"; f.src=d.preview; f.title=(d.name||"Document")+" preview";
+      f.setAttribute("referrerpolicy","no-referrer-when-downgrade");
+      f.setAttribute("allow","fullscreen");
+      mBody.innerHTML=""; mBody.appendChild(f);
+      $("#mFoot").innerHTML="Preview loads when you are signed in to Infor. If it stays blank (for example in a shared preview), use <b>Open</b> or <b>Download</b> above.";
+    }else{
+      mBody.innerHTML='<div class="noview">'
+        +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>'
+        +'<p>This file type has no inline viewer.</p>'
+        +'<p class="sub">Use <b>Open</b> to view it in SharePoint or Outlook, or <b>Download</b> to save a copy. Your download has been started in the background.</p></div>';
+      $("#mFoot").textContent="";
+    }
+    modal.hidden=false;
+    try{document.body.style.overflow="hidden";}catch(e){}
+    $("#mClose").focus();
+    // start the download in the background (inert inside the sandboxed artifact preview)
+    try{
+      if(d.download){
+        if(!dlFrame){dlFrame=document.createElement("iframe");dlFrame.style.display="none";dlFrame.setAttribute("aria-hidden","true");document.body.appendChild(dlFrame);}
+        dlFrame.src=d.download;
+      }
+    }catch(e){}
+  }
+  $("#mClose").addEventListener("click",closeDoc);
+  Array.prototype.forEach.call(modal.querySelectorAll("[data-close]"),function(x){x.addEventListener("click",closeDoc);});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeDoc();});
 
   /* reveal on scroll, with a guaranteed fallback */
   var revs=document.querySelectorAll(".reveal");

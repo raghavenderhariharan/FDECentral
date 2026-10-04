@@ -17,8 +17,12 @@ is a single, self-contained `index.html` with no build step.
   full recording in SharePoint.
 - **Shared on this day** — a resource library of every file posted for the session, grouped
   (Session materials, Atlanta Meeting, M3 Gateway Toolkit, …) with colour-coded file-type badges.
-  Each card links to the file; each group header links to its SharePoint folder.
-- **Decisions & follow-ups** — the session's agreed decisions and action items with status pills.
+  Clicking a document, deck or email opens a **scrollable preview popup** (SharePoint / Office
+  Online embed) and starts a download in the background. Office files and PDFs preview inline;
+  email (`.eml`) files have no inline viewer, so the popup offers Open / Download instead. As with
+  the video, inline preview needs an Infor sign-in and is blocked in the public artifact sandbox —
+  the popup always offers Open in SharePoint and Download as fallbacks.
+- **Decisions** — the session's agreed decisions.
 
 ## Source of truth
 
