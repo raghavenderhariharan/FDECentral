@@ -211,18 +211,6 @@ section.block{padding-block:30px}
 .meta dd{margin:0;color:var(--fg)}
 .meta .desc{color:var(--fg-2);font-size:14px;margin:0;max-width:80ch}
 .meta .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
-.docchip{display:flex;align-items:center;gap:13px;text-decoration:none;color:var(--fg);max-width:560px;
-  background:color-mix(in srgb,var(--accent) 9%, var(--surface-2));
-  border:1px solid color-mix(in srgb,var(--accent) 30%, var(--line));border-radius:12px;padding:12px 14px;
-  transition:border-color .2s,transform .2s,background .2s}
-.docchip:hover{transform:translateY(-2px);border-color:var(--accent)}
-.docchip .badge{width:42px;height:42px;flex:none}
-.docchip .dcmeta{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
-.docchip .dcmeta b{font-family:var(--display);font-weight:600;font-size:14px;line-height:1.2}
-.docchip .dcmeta span{font-size:12px;color:var(--fg-3);line-height:1.4}
-.docchip .arrow{flex:none;color:var(--accent);transition:transform .2s}
-.docchip .arrow svg{width:16px;height:16px}
-.docchip:hover .arrow{transform:translate(2px,-2px)}
 .btn{
   display:inline-flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none;
   font:inherit;font-size:13.5px;font-weight:500;border-radius:11px;padding:10px 15px;
@@ -580,18 +568,15 @@ var DATA = {
           +'<dt>Recording</dt><dd>'+esc(r.kind)+'</dd>'
         +'</dl>'
         +'<p class="desc">'+esc(s.summary)+'</p>'
-        +(s.summaryDoc?(
-          '<a class="docchip" href="'+esc(viewUrl(fileUrl(s.folderUrl,s.summaryDoc),extOf(s.summaryDoc)))+'" target="_blank" rel="noopener">'
-            +'<span class="badge badge--doc">DOCX</span>'
-            +'<span class="dcmeta"><b>Detailed meeting summary</b><span>Full write-up of every topic, with decisions and follow-ups</span></span>'
-            +'<span class="arrow">'+extLink+'</span>'
-          +'</a>'
-        ):'')
         +'<div class="actions">'
           +'<a class="btn primary" href="'+esc(r.url)+'" target="_blank" rel="noopener">'
             +'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch recording</a>'
           +'<a class="btn ghost" href="'+esc(s.folderUrl)+'" target="_blank" rel="noopener">'
             +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h5l2 2h9v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/></svg>Open day folder</a>'
+          +(s.summaryDoc?(
+            '<a class="btn ghost" href="'+esc(viewUrl(fileUrl(s.folderUrl,s.summaryDoc),extOf(s.summaryDoc)))+'" target="_blank" rel="noopener">'
+              +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M9 13h6M9 17h4"/></svg>Summary</a>'
+          ):'')
         +'</div>'
       +'</div>';
     $("#feature").innerHTML=fhtml;
