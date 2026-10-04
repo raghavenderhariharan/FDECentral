@@ -160,7 +160,7 @@ section.block{padding-block:30px}
 .daytab.ghost:hover{transform:none}
 
 /* ---- now playing hero ---- */
-.feature{display:grid;grid-template-columns:1.5fr 1fr;gap:22px;align-items:stretch}
+.feature{display:block}
 .player{
   position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);
   aspect-ratio:16/9;cursor:pointer;display:block;text-decoration:none;color:#fff;
@@ -209,7 +209,7 @@ section.block{padding-block:30px}
 .meta dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:9px 14px;font-size:13.5px}
 .meta dt{color:var(--fg-3);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .meta dd{margin:0;color:var(--fg)}
-.meta .desc{color:var(--fg-2);font-size:14px;margin:0}
+.meta .desc{color:var(--fg-2);font-size:14px;margin:0;max-width:80ch}
 .meta .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
 .btn{
   display:inline-flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none;
@@ -606,57 +606,25 @@ var DATA = {
 
   function renderFeature(s){
     var r=s.recordings[0];
-    var waves=""; for(var i=0;i<34;i++){waves+='<i style="animation-delay:'+(i*0.045).toFixed(2)+'s"></i>';}
     var fhtml=''
-      +'<div class="pcol">'
-        +'<div class="player" id="player" role="button" tabindex="0" aria-label="Play the recording inline">'
-          +'<div class="ghostword">FDE<br>CENTRAL</div>'
-          +'<div class="scrim"></div>'
-          +'<div class="tag"><i></i>FULL RECORDING</div>'
-          +'<div class="wave">'+waves+'</div>'
-          +'<div class="playbtn"><b></b></div>'
-          +'<div class="foot"><h3>'+esc(r.title)+'</h3><span class="dur">'+esc(r.dur)+'</span></div>'
-        +'</div>'
-        +'<p class="playnote"><span class="pn-ico">▶</span> Click to play inline. Inline playback needs an Infor sign-in; if the frame stays blank (e.g. a shared preview), <a href="'+esc(r.url)+'" target="_blank" rel="noopener">open it in SharePoint ↗</a>.</p>'
-      +'</div>'
       +'<div class="meta">'
         +'<p class="ttl">'+esc(s.title)+'</p>'
         +'<dl>'
           +'<dt>Date</dt><dd>'+esc(s.dateLabel)+'</dd>'
           +'<dt>Time</dt><dd>'+esc(s.time)+'</dd>'
           +'<dt>Host</dt><dd>'+esc(s.organizer)+'</dd>'
-          +'<dt>Format</dt><dd>'+esc(r.kind)+'</dd>'
+          +'<dt>Recording</dt><dd>'+esc(r.kind)+'</dd>'
         +'</dl>'
         +'<p class="desc">'+esc(s.summary)+'</p>'
         +'<div class="actions">'
-          +'<button class="btn primary" type="button" id="playBtn">'
-            +'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play inline</button>'
-          +'<a class="btn ghost" href="'+esc(r.url)+'" target="_blank" rel="noopener">'
-            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>Open in SharePoint</a>'
+          +'<a class="btn primary" href="'+esc(r.url)+'" target="_blank" rel="noopener">'
+            +'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch recording</a>'
           +'<a class="btn ghost" href="'+esc(s.folderUrl)+'" target="_blank" rel="noopener">'
-            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h5l2 2h9v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/></svg>Day folder</a>'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h5l2 2h9v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/></svg>Open day folder</a>'
         +'</div>'
       +'</div>';
     $("#feature").innerHTML=fhtml;
     $("#npLede").textContent=s.badge;
-
-    var player=$("#player");
-    function play(){
-      if(!player||player.getAttribute("data-playing"))return;
-      player.setAttribute("data-playing","1");
-      player.classList.add("playing");
-      var f=document.createElement("iframe");
-      f.className="frame";
-      f.src=r.url;
-      f.title=r.title;
-      f.setAttribute("allow","autoplay; encrypted-media; fullscreen; picture-in-picture");
-      f.setAttribute("allowfullscreen","");
-      player.innerHTML="";
-      player.appendChild(f);
-    }
-    player.addEventListener("click",play);
-    player.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();play();}});
-    var pb=$("#playBtn"); if(pb){pb.addEventListener("click",play);}
   }
 
   function renderChapters(s){
