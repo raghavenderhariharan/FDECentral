@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FDE Central Hub</title>
+<meta name="description" content="Recordings, chapters and shared materials from the FDE Central Biweekly Connect, organised by session day.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ============================================================
+   FDE Central Hub — a learning hub for the biweekly connect.
+   Layout: sticky brand bar · date timeline · "now playing" hero
+   · horizontal chapter playlist · day resource library · decisions.
+   Dark-first; coral accent (a nod to Infor) with a teal second.
+   ============================================================ */
+:root{
+  /* colour — dark values on bare :root (dark-first) */
+  --bg:#0d1117; --bg-2:#10151e; --surface:#161c27; --surface-2:#1d2533;
+  --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  --fg:#eaf0f7; --fg-2:#aab6c4; --fg-3:#7c8a99;
+  --accent:#ff6a4d; --accent-2:#46c9d6; --glow:rgba(255,106,77,.22);
+  --ok:#49d49c; --warn:#f3b64c; --info:#64a8ff;
+  /* type */
+  --display:"Sora",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --bg:#eef1f5; --bg-2:#e7ebf1; --surface:#ffffff; --surface-2:#f3f5f9;
+    --line:rgba(13,30,50,.10); --line-2:rgba(13,30,50,.18);
+    --fg:#141b24; --fg-2:#4a5867; --fg-3:#6b7a8a;
+    --accent:#e24a34; --accent-2:#0d9aa8; --glow:rgba(226,74,52,.15);
+    --ok:#138a63; --warn:#b67514; --info:#2f6fd6;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#eef1f5; --bg-2:#e7ebf1; --surface:#ffffff; --surface-2:#f3f5f9;
+  --line:rgba(13,30,50,.10); --line-2:rgba(13,30,50,.18);
+  --fg:#141b24; --fg-2:#4a5867; --fg-3:#6b7a8a;
+  --accent:#e24a34; --accent-2:#0d9aa8; --glow:rgba(226,74,52,.15);
+  --ok:#138a63; --warn:#b67514; --info:#2f6fd6;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#0d1117; --bg-2:#10151e; --surface:#161c27; --surface-2:#1d2533;
+  --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  --fg:#eaf0f7; --fg-2:#aab6c4; --fg-3:#7c8a99;
+  --accent:#ff6a4d; --accent-2:#46c9d6; --glow:rgba(255,106,77,.22);
+  --ok:#49d49c; --warn:#f3b64c; --info:#64a8ff;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--fg);
+  font-family:var(--body); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{max-width:100%}
+[hidden]{display:none!important}
+a{color:inherit}
+::selection{background:var(--accent);color:#fff}
+
+/* ambient background */
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(60vw 48vh at 82% -8%, var(--glow), transparent 60%),
+    radial-gradient(48vw 40vh at 2% 4%, color-mix(in srgb,var(--accent-2) 16%, transparent), transparent 62%);
+}
+
+/* ---- layout shell ---- */
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px}
+
+/* ---- header ---- */
+header{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:30;
+  background:color-mix(in srgb,var(--bg) 82%, transparent);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.bar{display:flex;align-items:center;gap:14px;padding-block:13px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.mark{
+  width:40px;height:40px;border-radius:11px;flex:none;
+  display:grid;place-items:center;font-family:var(--display);font-weight:700;
+  color:#fff;letter-spacing:.5px;font-size:15px;
+  background:linear-gradient(135deg,var(--accent),#ff9770);
+  box-shadow:0 6px 18px -6px var(--glow);
+}
+.brand b{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.2px;display:block;line-height:1.1}
+.brand span{font-family:var(--mono);font-size:11px;color:var(--fg-3);letter-spacing:.14em;text-transform:uppercase}
+.bar .sp{flex:1}
+.hbtn{
+  display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+  font:inherit;font-size:13px;color:var(--fg);
+  background:var(--surface);border:1px solid var(--line-2);
+  border-radius:10px;padding:8px 12px;text-decoration:none;white-space:nowrap;
+  transition:border-color .2s, transform .2s, background .2s;
+}
+.hbtn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.hbtn svg{width:15px;height:15px}
+.icon-btn{padding:8px;width:38px;justify-content:center}
+
+/* ---- hero intro ---- */
+.intro{padding-block:34px 10px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+.intro h1{
+  font-family:var(--display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(28px,5.4vw,46px);line-height:1.03;margin:0;text-wrap:balance;max-width:16ch;
+}
+.intro p{color:var(--fg-2);max-width:60ch;margin:14px 0 0;font-size:16px}
+
+/* ---- stat chips ---- */
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.stat{
+  background:var(--surface);border:1px solid var(--line);border-radius:13px;
+  padding:12px 16px;min-width:116px;flex:1 1 116px;
+}
+.stat b{font-family:var(--display);font-size:24px;font-weight:700;display:block;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--fg-3);letter-spacing:.04em}
+
+/* ---- section scaffolding ---- */
+section.block{padding-block:30px}
+.shead{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.shead h2{font-family:var(--display);font-weight:600;font-size:21px;letter-spacing:-.01em;margin:0}
+.shead .lede{color:var(--fg-3);font-size:13.5px;flex:1;min-width:200px}
+.folderlink{
+  font-family:var(--mono);font-size:12px;color:var(--fg-2);text-decoration:none;
+  display:inline-flex;align-items:center;gap:6px;border-bottom:1px dashed var(--line-2);padding-bottom:2px;
+  transition:color .2s,border-color .2s;
+}
+.folderlink:hover{color:var(--accent);border-color:var(--accent)}
+.folderlink svg{width:13px;height:13px}
+
+/* ---- session timeline ---- */
+.timeline{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.daytab{
+  flex:none;cursor:pointer;text-align:left;font:inherit;color:var(--fg-2);
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:12px 16px;min-width:140px;transition:border-color .2s,transform .2s,color .2s,background .2s;
+}
+.daytab:hover{transform:translateY(-2px);border-color:var(--line-2)}
+.daytab .d{font-family:var(--display);font-weight:700;font-size:17px;color:var(--fg);line-height:1}
+.daytab .m{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-top:5px}
+.daytab .t{font-size:12px;color:var(--fg-3);margin-top:7px}
+.daytab[aria-selected="true"]{
+  border-color:transparent;color:#fff;background:linear-gradient(140deg,var(--accent),#ff9065);
+  box-shadow:0 10px 26px -12px var(--glow);
+}
+.daytab[aria-selected="true"] .d,.daytab[aria-selected="true"] .t{color:#fff}
+.daytab[aria-selected="true"] .m{color:rgba(255,255,255,.85)}
+.daytab.ghost{border-style:dashed;opacity:.65;cursor:default}
+.daytab.ghost:hover{transform:none}
+
+/* ---- now playing hero ---- */
+.feature{display:grid;grid-template-columns:1.5fr 1fr;gap:22px;align-items:stretch}
+.player{
+  position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);
+  aspect-ratio:16/9;cursor:pointer;display:block;text-decoration:none;color:#fff;
+  background:
+    radial-gradient(120% 120% at 20% 10%, #2a3647 0%, #161c27 45%, #0c111a 100%);
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+}
+.player:hover{transform:translateY(-3px);box-shadow:0 26px 60px -30px rgba(0,0,0,.8);border-color:var(--accent)}
+.player .scrim{position:absolute;inset:0;background:
+   linear-gradient(0deg,rgba(0,0,0,.55),transparent 42%),
+   radial-gradient(90% 80% at 78% 18%, var(--glow), transparent 55%)}
+.player .ghostword{
+  position:absolute;top:14px;left:18px;right:18px;font-family:var(--display);font-weight:700;
+  font-size:clamp(26px,5vw,52px);line-height:.95;letter-spacing:-.02em;
+  color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.12);opacity:.9;pointer-events:none;
+}
+.player .tag{
+  position:absolute;top:16px;right:16px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+  background:rgba(255,80,60,.92);color:#fff;padding:5px 9px;border-radius:7px;display:flex;align-items:center;gap:6px;
+}
+.player .tag i{width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;animation:blink 1.6s infinite}
+.playbtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:76px;height:76px;display:grid;place-items:center}
+.playbtn::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--accent);opacity:.35;animation:pulse 2.6s ease-out infinite}
+.playbtn b{position:relative;width:60px;height:60px;border-radius:50%;background:var(--accent);display:grid;place-items:center;box-shadow:0 10px 30px -8px var(--glow)}
+.playbtn b::after{content:"";border-left:19px solid #fff;border-top:12px solid transparent;border-bottom:12px solid transparent;margin-left:5px}
+.player .foot{position:absolute;left:0;right:0;bottom:0;padding:16px 18px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.player .foot h3{font-family:var(--display);font-weight:600;font-size:16px;margin:0;max-width:72%;text-shadow:0 1px 10px rgba(0,0,0,.5)}
+.player .dur{font-family:var(--mono);font-size:12px;background:rgba(0,0,0,.5);padding:5px 9px;border-radius:7px;white-space:nowrap}
+.wave{position:absolute;left:18px;right:18px;bottom:52px;height:26px;display:flex;align-items:flex-end;gap:3px;opacity:.6}
+.wave i{flex:1;background:linear-gradient(var(--accent),var(--accent-2));border-radius:2px;height:30%}
+@media (prefers-reduced-motion:no-preference){.wave i{animation:wave 1.3s ease-in-out infinite}}
+
+.meta{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.meta .ttl{font-family:var(--display);font-weight:600;font-size:19px;letter-spacing:-.01em;margin:0}
+.meta dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:9px 14px;font-size:13.5px}
+.meta dt{color:var(--fg-3);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.meta dd{margin:0;color:var(--fg)}
+.meta .desc{color:var(--fg-2);font-size:14px;margin:0}
+.meta .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none;
+  font:inherit;font-size:13.5px;font-weight:500;border-radius:11px;padding:10px 15px;
+  transition:transform .2s,box-shadow .2s,border-color .2s,background .2s;
+}
+.btn svg{width:16px;height:16px}
+.btn.primary{background:var(--accent);color:#fff;border:1px solid var(--accent);box-shadow:0 10px 24px -12px var(--glow)}
+.btn.primary:hover{transform:translateY(-2px);box-shadow:0 16px 30px -12px var(--glow)}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line-2)}
+.btn.ghost:hover{border-color:var(--accent);transform:translateY(-2px)}
+
+/* ---- chapter playlist rail ---- */
+.rail{display:flex;gap:16px;overflow-x:auto;padding:4px 2px 16px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.rail::-webkit-scrollbar{height:9px}
+.rail::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:9px}
+.clip{
+  flex:none;width:282px;max-width:84vw;scroll-snap-align:start;text-decoration:none;color:var(--fg);
+  background:var(--surface);border:1px solid var(--line);border-radius:15px;overflow:hidden;
+  display:flex;flex-direction:column;transition:transform .25s,border-color .25s,box-shadow .25s;
+}
+.clip:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 20px 40px -24px rgba(0,0,0,.6)}
+.clip .thumb{
+  position:relative;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden;
+  background:linear-gradient(135deg,#243043,#141a24);
+}
+.clip .thumb .idx{font-family:var(--display);font-weight:700;font-size:54px;color:rgba(255,255,255,.08);position:absolute;right:12px;bottom:-6px;line-height:1}
+.clip .thumb .play{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);display:grid;place-items:center;backdrop-filter:blur(4px);transition:background .2s,transform .2s}
+.clip:hover .thumb .play{background:var(--accent);transform:scale(1.08)}
+.clip .thumb .play::after{content:"";border-left:13px solid #fff;border-top:8px solid transparent;border-bottom:8px solid transparent;margin-left:3px}
+.clip .thumb .cn{position:absolute;top:10px;left:12px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:rgba(255,255,255,.75)}
+.clip .body{padding:13px 15px 15px;display:flex;flex-direction:column;gap:7px;flex:1}
+.clip .ctag{align-self:flex-start;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-2);background:color-mix(in srgb,var(--accent-2) 14%,transparent);padding:3px 8px;border-radius:6px}
+.clip h3{font-family:var(--display);font-weight:600;font-size:15px;margin:0;line-height:1.25}
+.clip .who{font-size:12.5px;color:var(--fg-3)}
+.clip p{font-size:12.5px;color:var(--fg-2);margin:0;line-height:1.5}
+.railhint{font-size:12.5px;color:var(--fg-3);font-family:var(--mono)}
+
+/* ---- resource library ---- */
+.resgroup{margin-bottom:22px}
+.rgh{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.rgh h3{font-family:var(--display);font-weight:600;font-size:16px;margin:0;display:flex;align-items:center;gap:9px}
+.rgh .count{font-family:var(--mono);font-size:11px;color:var(--fg-3);background:var(--surface-2);padding:2px 8px;border-radius:20px}
+.rgh .sp{flex:1}
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:10px}
+.file{
+  display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--fg);
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 13px;min-width:0;
+  transition:border-color .2s,transform .2s,background .2s;
+}
+.file:hover{border-color:var(--accent);transform:translateY(-2px)}
+.badge{
+  flex:none;width:40px;height:40px;border-radius:9px;display:grid;place-items:center;
+  font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.02em;color:#fff;
+}
+.badge--doc{background:linear-gradient(135deg,#3b74d6,#2a5bb0)}
+.badge--ppt{background:linear-gradient(135deg,#e06a33,#c8521f)}
+.badge--eml{background:linear-gradient(135deg,#17a2a8,#108088)}
+.badge--html{background:linear-gradient(135deg,#8a5cf0,#6c3fd4)}
+.badge--mp4{background:linear-gradient(135deg,#e2465a,#c22f44)}
+.badge--pdf{background:linear-gradient(135deg,#d7443a,#b22d26)}
+.badge--other{background:linear-gradient(135deg,#5a6b7d,#44515f)}
+.file .fmeta{min-width:0;flex:1}
+.file .fname{font-size:13px;line-height:1.35;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.file .fkind{font-family:var(--mono);font-size:10.5px;color:var(--fg-3);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
+.file .arrow{flex:none;color:var(--fg-3);transition:color .2s,transform .2s}
+.file:hover .arrow{color:var(--accent);transform:translate(2px,-2px)}
+.file .arrow svg{width:15px;height:15px}
+
+/* ---- decisions + followups ---- */
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+.panel h3{font-family:var(--display);font-weight:600;font-size:16px;margin:0 0 14px;display:flex;align-items:center;gap:9px}
+.panel h3 .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+.declist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.declist li{display:flex;gap:11px;font-size:13.5px;color:var(--fg-2);line-height:1.5}
+.declist li .tick{flex:none;color:var(--accent);margin-top:2px}
+.declist li .tick svg{width:16px;height:16px}
+.fu{display:flex;flex-direction:column;gap:11px}
+.fuitem{display:flex;gap:12px;align-items:flex-start;padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2)}
+.fuitem .txt{min-width:0;flex:1}
+.fuitem .txt b{font-size:13.5px;font-weight:500;color:var(--fg);display:block;line-height:1.4}
+.fuitem .txt span{font-family:var(--mono);font-size:11px;color:var(--fg-3)}
+.pill{flex:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:4px 9px;border-radius:20px;white-space:nowrap;font-weight:500}
+.pill.planned{color:var(--info);background:color-mix(in srgb,var(--info) 16%,transparent)}
+.pill.open{color:var(--warn);background:color-mix(in srgb,var(--warn) 18%,transparent)}
+.pill.progress{color:var(--accent-2);background:color-mix(in srgb,var(--accent-2) 16%,transparent)}
+.pill.ongoing{color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,transparent)}
+
+/* ---- footer ---- */
+footer{border-top:1px solid var(--line);margin-top:20px}
+.foot-in{padding-block:26px 40px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;color:var(--fg-3);font-size:12.5px}
+.foot-in a{color:var(--fg-2)}
+.foot-in .note{font-family:var(--mono);max-width:52ch;line-height:1.6}
+
+/* ---- reveal animation ---- */
+html.js .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+html.js .reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){html.js .reveal{opacity:1!important;transform:none!important;transition:none}}
+
+/* ---- keyframes ---- */
+@keyframes pulse{0%{transform:scale(1);opacity:.4}70%{transform:scale(1.9);opacity:0}100%{opacity:0}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes wave{0%,100%{height:28%}50%{height:96%}}
+
+/* ---- responsive ---- */
+@media (max-width:860px){
+  .feature{grid-template-columns:1fr}
+  .twocol{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+  .brand span{display:none}
+  .intro{padding-top:26px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <div class="brand">
+      <div class="mark">FDE</div>
+      <div><b>FDE Central</b><span>Biweekly Connect · Hub</span></div>
+    </div>
+    <div class="sp"></div>
+    <a class="hbtn" id="spLink" href="#" target="_blank" rel="noopener" title="Open the source folder in SharePoint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h5l2 2h9v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/></svg>
+      SharePoint
+    </a>
+    <button class="hbtn icon-btn" id="themeBtn" title="Switch theme" aria-label="Switch theme"></button>
+  </div>
+</header>
+
+<main class="wrap" id="app">
+  <section class="intro">
+    <p class="eyebrow">Trainings &amp; recordings</p>
+    <h1 id="heroTitle">Every session, in one place.</h1>
+    <p id="heroSub">Recordings play back as chapter clips and everything shared on the day — decks, docs, toolkits and emails — sits beside them. Pick a date to dive in.</p>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="block">
+    <div class="shead">
+      <h2>Sessions</h2>
+      <p class="lede">The biweekly connect timeline. New sessions appear here as they are published.</p>
+    </div>
+    <div class="timeline" id="timeline" role="tablist" aria-label="Session dates"></div>
+  </section>
+
+  <section class="block reveal" id="nowPlaying">
+    <div class="shead">
+      <h2>Now playing</h2>
+      <p class="lede" id="npLede"></p>
+    </div>
+    <div class="feature" id="feature"></div>
+  </section>
+
+  <section class="block reveal" id="chaptersWrap">
+    <div class="shead">
+      <h2>Chapters</h2>
+      <p class="lede">Each clip opens the full recording in SharePoint — jump to the topic you want.</p>
+    </div>
+    <div class="rail" id="chapters"></div>
+  </section>
+
+  <section class="block reveal" id="sharedWrap">
+    <div class="shead">
+      <h2>Shared on this day</h2>
+      <p class="lede" id="sharedLede"></p>
+    </div>
+    <div id="library"></div>
+  </section>
+
+  <section class="block reveal" id="outcomes">
+    <div class="shead"><h2>Decisions &amp; follow-ups</h2></div>
+    <div class="twocol">
+      <div class="panel">
+        <h3><span class="dot"></span>Decisions</h3>
+        <ul class="declist" id="decisions"></ul>
+      </div>
+      <div class="panel">
+        <h3><span class="dot" style="background:var(--accent-2)"></span>Follow-ups</h3>
+        <div class="fu" id="followups"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <span class="note">Links open in SharePoint and need an Infor sign-in. Recordings play in the SharePoint / Stream player. Built from the FDE Central biweekly connect library.</span>
+    <a id="footLink" href="#" target="_blank" rel="noopener">Open the full library →</a>
+  </div>
+</footer>
+
+<script>
+/* =================================================================
+   DATA — to add a session, append an object to DATA.sessions.
+   File links are built as:  group.folderUrl + "/" + encodeURIComponent(name)
+   so you only supply raw file names. Recordings use their own url.
+   ================================================================= */
+var SP_ROOT = "https://inforonline.sharepoint.com/sites/Infor_Velocity_Suite_Usecase2/Shared%20Documents/FDE_Infor_Velocity_Suite/FDE-%20Infor%20Velocity%20Suite/FDE%20Central%20Biweekly%20Connect";
+
+var DATA = {
+  libraryUrl: SP_ROOT,
+  sessions: [
+    (function(){
+      var day = SP_ROOT + "/28-Sep-2026";
+      var atlanta = day + "/FDA%20-%20Atlanta%20Meeting";
+      var m3 = day + "/M3%20Gateway%20Toolkit";
+      return {
+        id:"2026-09-28",
+        d:"28", m:"Sep", y:"2026",
+        dateLabel:"28 September 2026",
+        weekday:"Biweekly connect",
+        badge:"Session 01 · Inaugural",
+        title:"FDE Central Biweekly Connect",
+        time:"6:00 – 7:00 PM IST",
+        organizer:"Raghavender Hariharan",
+        folderUrl: day,
+        summary:"The inaugural FDE Central connect set the forum for aligning FDE teams on innovations, platform and ERP updates, reusable tools and customer-fit scenarios. It covered the Atlanta architects enablement, the Generic Document Upload Widget, a live TeamAir PO demo, the M3 API Gateway Toolkit, and an early look at synchronous Compass for other CloudSuites.",
+        recordings:[
+          { title:"FDE Central Biweekly Connect — Full Recording",
+            kind:"MP4 · ≈203 MB · Microsoft Teams",
+            dur:"≈ 60 min",
+            url:"https://inforonline.sharepoint.com/sites/Infor_Velocity_Suite_Usecase2/Shared%20Documents/Forms/DispForm.aspx?ID=133" }
+        ],
+        topics:[
+          {tag:"Field enablement", title:"FDE Architects Session — Atlanta", who:"Raghavender Hariharan",
+           desc:"A week of in-person sessions with FDE architects and field CTOs. After structured Kiro learning, by day three participants were building specs and deploying use cases into tenants. Infor IQ flagged as a key future direction."},
+          {tag:"GenAI · IDM", title:"Generic Document Upload Widget", who:"Venugopal",
+           desc:"A configurable GenAI widget that classifies a document, pulls the required IDM attributes, extracts values (including Arabic invoices), lets the user correct them, uploads to IDM and can trigger downstream ERP or Review Center actions."},
+          {tag:"Automation", title:"TeamAir PO Acknowledgement Demo", who:"Live demonstration",
+           desc:"End-to-end: intake by email or widget, extract, validate the PO against ERP, apply the acknowledged changes through an API flow, then store the document and attributes. Intake stays generic; ERP actions live downstream."},
+          {tag:"M3 · Performance", title:"M3 API Gateway Toolkit", who:"Sarada",
+           desc:"A BAS microservice via ION API Gateway using M3 ExportMI. It consolidates many inquiry calls into one, enforces object-level security, and cut tested response times from ~15–20s to ~2–3s. Built for inquiries, not transactions."},
+          {tag:"Platform · Roadmap", title:"Compass for Other CloudSuites", who:"Sarada",
+           desc:"Exploring a synchronous Compass Data Fabric API (expected in October behind a feature toggle) to bring the same inquiry pattern to non-M3 CloudSuites — weighing data limits, resiliency and best-practice guidance."}
+        ],
+        library:[
+          { group:"Session materials", icon:"doc", folderUrl: day, items:[
+            {name:"FDE_Central_Biweekly_Connect_Detailed_Summary.docx"},
+            {name:"Generic Widget IDM-GenAI-Upload-Demo.pptx"}
+          ]},
+          { group:"FDA · Atlanta Meeting", icon:"users", folderUrl: atlanta, items:[
+            {name:"Derek's Security & Governance Session.docx"},
+            {name:"Derek's Security & Governance Session.eml"},
+            {name:"FDE Regional Architects.eml"},
+            {name:"GenAI - Platform at a glance - Session by Marcio.eml"},
+            {name:"GenAI Live platform capabilities.docx"},
+            {name:"INFOR PLATFORM TECH VISION.docx"},
+            {name:"Key & Interesting highlights from Brad's session with FDAs.eml"},
+            {name:"KYR Microservice Architecture Document.docx"},
+            {name:"KYR Microservice Responsibilities.docx"},
+            {name:"Manju's Platform Tech Vision.eml"},
+            {name:"Velocity Suite - Capability owners.eml"},
+            {name:"Velocity Suite Capability Owners.docx"},
+            {name:"Velocity Suite Positioning - Net New implementation.eml"},
+            {name:"Velocity Suite Positioning.docx"}
+          ]},
+          { group:"M3 Gateway Toolkit", icon:"code", folderUrl: m3, items:[
+            {name:"gateway-motion.html"},
+            {name:"M3-Gateway-Pitch_4710.html"},
+            {name:"widget-tour.html"}
+          ]}
+        ],
+        decisions:[
+          "Continue the biweekly connect as the forum for innovations, tools, platform and ERP updates, and reusable customer solutions.",
+          "Choose the widget for point-of-receipt, user-initiated processing; choose central automation when documents arrive in a shared inbox at scale.",
+          "Keep the upload widget generic and configurable; put process-specific ERP actions in downstream API flows.",
+          "Use the M3 gateway for inquiries to cut API calls, enforce object-level security and improve performance — not for transactional actions.",
+          "Evaluate synchronous Compass carefully: data-size limits, resiliency and a fallback when Data Fabric is degraded.",
+          "Default to reuse and contribution — extend shared components instead of building near-duplicate per-customer variants."
+        ],
+        followups:[
+          {text:"Share recordings, slides, docs & links in one consolidated artifact", owner:"FDE Central", status:"Planned"},
+          {text:"Share the BAS APIs so teams can explore the M3 gateway", owner:"Toolkit team", status:"Planned"},
+          {text:"Identify customer use cases that fit the widget or gateway", owner:"FDE teams", status:"Open"},
+          {text:"Test synchronous Compass; document pros, cons & limits", owner:"Platform team", status:"In progress"},
+          {text:"Continue Zahid business-user validation and customer trials", owner:"M3 stakeholders", status:"In progress"},
+          {text:"Reuse widget & gateway components; contribute missing features back", owner:"Engineering", status:"Ongoing"}
+        ]
+      };
+    })()
+  ]
+};
+
+/* ===================== rendering ===================== */
+(function(){
+  var E=document.documentElement; E.classList.add("js");
+  var $=function(s){return document.querySelector(s);};
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function fileUrl(folder,name){return folder+"/"+encodeURIComponent(name);}
+  function extOf(name){var i=name.lastIndexOf(".");return i<0?"":name.slice(i+1).toLowerCase();}
+  function badgeClass(ext){
+    if(ext==="docx"||ext==="doc")return "doc";
+    if(ext==="pptx"||ext==="ppt")return "ppt";
+    if(ext==="eml"||ext==="msg")return "eml";
+    if(ext==="html"||ext==="htm")return "html";
+    if(ext==="mp4"||ext==="mov")return "mp4";
+    if(ext==="pdf")return "pdf";
+    return "other";
+  }
+  function kindLabel(ext){
+    var map={docx:"Word document",doc:"Word document",pptx:"Presentation",ppt:"Presentation",
+      eml:"Email thread",msg:"Email thread",html:"Web page",htm:"Web page",pdf:"PDF",mp4:"Recording",mov:"Recording"};
+    return map[ext]||(ext?ext.toUpperCase()+" file":"File");
+  }
+  function pillClass(s){s=s.toLowerCase();if(s==="planned")return "planned";if(s==="open")return "open";if(s==="ongoing")return "ongoing";return "progress";}
+
+  var groupIcons={
+    doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>',
+    users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg>',
+    code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>'
+  };
+  var extLink='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>';
+
+  var state={idx:0};
+
+  function countFiles(s){var n=0;s.library.forEach(function(g){n+=g.items.length;});return n;}
+
+  function renderStats(){
+    var S=DATA.sessions, files=0, recs=0, topics=0;
+    S.forEach(function(s){files+=countFiles(s);recs+=s.recordings.length;topics+=s.topics.length;});
+    var rows=[[S.length,"Session"+(S.length>1?"s":"")],[recs,"Recording"+(recs>1?"s":"")],[files,"Files shared"],[topics,"Topics covered"]];
+    $("#stats").innerHTML=rows.map(function(r){return '<div class="stat"><b>'+r[0]+'</b><span>'+r[1]+'</span></div>';}).join("");
+  }
+
+  function renderTimeline(){
+    var html=DATA.sessions.map(function(s,i){
+      return '<button class="daytab" role="tab" data-i="'+i+'" aria-selected="'+(i===state.idx)+'">'
+        +'<div class="d">'+esc(s.d)+'</div>'
+        +'<div class="m">'+esc(s.m)+" "+esc(s.y)+'</div>'
+        +'<div class="t">'+esc(s.weekday)+'</div></button>';
+    }).join("");
+    html+='<div class="daytab ghost"><div class="d">—</div><div class="m">Next</div><div class="t">Coming soon</div></div>';
+    var tl=$("#timeline"); tl.innerHTML=html;
+    Array.prototype.forEach.call(tl.querySelectorAll(".daytab[data-i]"),function(b){
+      b.addEventListener("click",function(){select(+b.getAttribute("data-i"));});
+    });
+  }
+
+  function renderFeature(s){
+    var r=s.recordings[0];
+    var waves=""; for(var i=0;i<34;i++){waves+='<i style="animation-delay:'+(i*0.045).toFixed(2)+'s"></i>';}
+    var fhtml=''
+      +'<a class="player" href="'+esc(r.url)+'" target="_blank" rel="noopener" aria-label="Play recording in SharePoint">'
+        +'<div class="ghostword">FDE<br>CENTRAL</div>'
+        +'<div class="scrim"></div>'
+        +'<div class="tag"><i></i>RECORDING</div>'
+        +'<div class="wave">'+waves+'</div>'
+        +'<div class="playbtn"><b></b></div>'
+        +'<div class="foot"><h3>'+esc(r.title)+'</h3><span class="dur">'+esc(r.dur)+'</span></div>'
+      +'</a>'
+      +'<div class="meta">'
+        +'<p class="ttl">'+esc(s.title)+'</p>'
+        +'<dl>'
+          +'<dt>Date</dt><dd>'+esc(s.dateLabel)+'</dd>'
+          +'<dt>Time</dt><dd>'+esc(s.time)+'</dd>'
+          +'<dt>Host</dt><dd>'+esc(s.organizer)+'</dd>'
+          +'<dt>Format</dt><dd>'+esc(r.kind)+'</dd>'
+        +'</dl>'
+        +'<p class="desc">'+esc(s.summary)+'</p>'
+        +'<div class="actions">'
+          +'<a class="btn primary" href="'+esc(r.url)+'" target="_blank" rel="noopener">'
+            +'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch recording</a>'
+          +'<a class="btn ghost" href="'+esc(s.folderUrl)+'" target="_blank" rel="noopener">'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h5l2 2h9v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/></svg>Open day folder</a>'
+        +'</div>'
+      +'</div>';
+    $("#feature").innerHTML=fhtml;
+    $("#npLede").textContent=s.badge;
+  }
+
+  function renderChapters(s){
+    var r=s.recordings[0];
+    var html=s.topics.map(function(t,i){
+      var n=("0"+(i+1)).slice(-2);
+      return '<a class="clip" href="'+esc(r.url)+'" target="_blank" rel="noopener">'
+        +'<div class="thumb"><span class="cn">CH '+n+'</span><span class="idx">'+n+'</span><span class="play"></span></div>'
+        +'<div class="body">'
+          +'<span class="ctag">'+esc(t.tag)+'</span>'
+          +'<h3>'+esc(t.title)+'</h3>'
+          +'<span class="who">'+esc(t.who)+'</span>'
+          +'<p>'+esc(t.desc)+'</p>'
+        +'</div></a>';
+    }).join("");
+    $("#chapters").innerHTML=html;
+  }
+
+  function renderLibrary(s){
+    var html=s.library.map(function(g){
+      var files=g.items.map(function(it){
+        var ext=extOf(it.name);
+        var label=ext?ext.toUpperCase():"FILE";
+        return '<a class="file" href="'+esc(fileUrl(g.folderUrl,it.name))+'" target="_blank" rel="noopener">'
+          +'<span class="badge badge--'+badgeClass(ext)+'">'+esc(label)+'</span>'
+          +'<span class="fmeta"><span class="fname">'+esc(it.name)+'</span><span class="fkind">'+esc(kindLabel(ext))+'</span></span>'
+          +'<span class="arrow">'+extLink+'</span></a>';
+      }).join("");
+      return '<div class="resgroup">'
+        +'<div class="rgh"><h3>'+(groupIcons[g.icon]||"")+esc(g.group)+'</h3>'
+          +'<span class="count">'+g.items.length+" item"+(g.items.length>1?"s":"")+'</span><span class="sp"></span>'
+          +'<a class="folderlink" href="'+esc(g.folderUrl)+'" target="_blank" rel="noopener">'+extLink+'open folder</a></div>'
+        +'<div class="files">'+files+'</div></div>';
+    }).join("");
+    $("#library").innerHTML=html;
+    $("#sharedLede").textContent="Everything posted for the "+s.dateLabel+" session — "+countFiles(s)+" files across "+s.library.length+" groups.";
+  }
+
+  function renderOutcomes(s){
+    var tick='<span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>';
+    $("#decisions").innerHTML=s.decisions.map(function(d){return '<li>'+tick+'<span>'+esc(d)+'</span></li>';}).join("");
+    $("#followups").innerHTML=s.followups.map(function(f){
+      return '<div class="fuitem"><div class="txt"><b>'+esc(f.text)+'</b><span>'+esc(f.owner)+'</span></div>'
+        +'<span class="pill '+pillClass(f.status)+'">'+esc(f.status)+'</span></div>';
+    }).join("");
+  }
+
+  function select(i){
+    state.idx=i;
+    var s=DATA.sessions[i];
+    Array.prototype.forEach.call(document.querySelectorAll(".daytab[data-i]"),function(b){
+      b.setAttribute("aria-selected", (+b.getAttribute("data-i"))===i ? "true":"false");
+    });
+    renderFeature(s); renderChapters(s); renderLibrary(s); renderOutcomes(s);
+  }
+
+  // links to SharePoint
+  $("#spLink").href=DATA.libraryUrl;
+  $("#footLink").href=DATA.libraryUrl;
+
+  renderStats(); renderTimeline(); select(0);
+
+  /* theme toggle */
+  var sun='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var moon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>';
+  function sysDark(){return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;}
+  function curTheme(){var t=E.getAttribute("data-theme");return t?t:(sysDark()?"dark":"light");}
+  function paintBtn(){$("#themeBtn").innerHTML=curTheme()==="dark"?sun:moon;}
+  try{var saved=localStorage.getItem("fdehub-theme"); if(saved){E.setAttribute("data-theme",saved);}}catch(e){}
+  paintBtn();
+  $("#themeBtn").addEventListener("click",function(){
+    var next=curTheme()==="dark"?"light":"dark";
+    E.setAttribute("data-theme",next);
+    try{localStorage.setItem("fdehub-theme",next);}catch(e){}
+    paintBtn();
+  });
+
+  /* reveal on scroll, with a guaranteed fallback */
+  var revs=document.querySelectorAll(".reveal");
+  function showAll(){Array.prototype.forEach.call(revs,function(el){el.classList.add("in");});}
+  if("IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(ents){
+      ents.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}});
+    },{rootMargin:"0px 0px -8% 0px",threshold:.08});
+    Array.prototype.forEach.call(revs,function(el){io.observe(el);});
+    setTimeout(showAll,1100);
+  }else{showAll();}
+})();
+</script>
+</body>
+</html>
