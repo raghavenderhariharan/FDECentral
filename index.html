@@ -490,6 +490,52 @@ var DATA = {
           {text:"Reuse widget & gateway components; contribute missing features back", owner:"Engineering", status:"Ongoing"}
         ]
       };
+    })(),
+    (function(){
+      var day = SP_ROOT + "/12-Oct-2026";
+      return {
+        id:"2026-10-12",
+        d:"12", m:"Oct", y:"2026",
+        dateLabel:"12 October 2026",
+        weekday:"Biweekly connect",
+        badge:"Session 02",
+        title:"FDE Central Biweekly Connect",
+        time:"≈ 8:30 AM IST",
+        organizer:"Raghavender Hariharan",
+        folderUrl: day,
+        summaryDoc:"FDE_Central_Biweekly_Connect_Detailed_Summary_12_Oct_2026 1.docx",
+        summary:"The second connect focused on functional, reusable FDE use cases across CSI and M3 — a Functional Analysis Tool that maps a use case to Industry Process Catalog processes, gaps and a phased automation approach; a CSI Audit Agent that answers who changed a business-critical field, what changed and when over a Birst model; an M3 CTP/ATP workbench that consolidates availability, sourcing and delivery-date recalculation for CSRs; and an M3 BOM-creation automation from emailed JSON + PDF inputs via M3 APIs, IDM and Review Center.",
+        recordings:[
+          { title:"FDE Central Biweekly Connect — Full Recording",
+            kind:"MP4 · ≈220 MB · Microsoft Teams",
+            dur:"≈ 60 min",
+            url:"https://inforonline.sharepoint.com/sites/Infor_Velocity_Suite_Usecase2/_layouts/15/stream.aspx?id=%2Fsites%2FInfor_Velocity_Suite_Usecase2%2FShared%20Documents%2FFDE_Infor_Velocity_Suite%2FFDE-%20Infor%20Velocity%20Suite%2FFDE%20Central%20Biweekly%20Connect%2F12-Oct-2026%2FFDE%20Central%20Biweekly%20Connect-20261012_083250-Meeting%20Recording.mp4&referrer=StreamWebApp.Web&referrerScenario=AddressBarCopied.view" }
+        ],
+        topics:[
+          {tag:"Discovery · StarForge", title:"Functional Analysis Tool", who:"Pratibha / Sarada team",
+           desc:"Maps an abstract use case to Industry Process Catalog processes, application coverage, gaps and a phased RPA/AI approach — plus ten customer-discovery questions. A Kiro-agent pipeline produces the analysis today; the intended home is StarForge (and AI Studio) to sharpen early discovery and estimation, not replace solution design."},
+          {tag:"CSI · Audit", title:"CSI Audit Agent", who:"Shankara & Saritha",
+           desc:"A conversational GenAI agent over a Birst-backed audit model that answers who changed a business-critical field, what changed, the old and new values, and when — shown for customer and purchase orders. Scope stays on business-value fields; data refreshes on the Birst load schedule with a visible timestamp."},
+          {tag:"M3 · CTP/ATP", title:"M3 CTP / ATP Workbench", who:"Anant / M3 team",
+           desc:"A CSR workspace that consolidates component availability and shortages, alternate-warehouse sourcing, distribution/purchase/manufacturing options and future supply, then recalculates a realistic capable-to-promise date. Demonstrated by resolving a shortage via an alternate warehouse. The value is consolidation and usability, with transparent overlap vs. standard ERP."},
+          {tag:"M3 · BOM automation", title:"M3 BOM Creation Use Case", who:"Chandrakanth",
+           desc:"Automates M3 item and multi-level BOM setup from an emailed JSON + PDF engineering drawing: validates fields, creates master data through M3 APIs, stores artifacts in IDM and routes exceptions to Review Center. Live for a European customer. JSON is the structured input; the PDF is the supporting drawing."}
+        ],
+        library:[
+          { group:"Session materials", icon:"doc", folderUrl: day, items:[
+            {name:"FDE_Central_Biweekly_Connect_Detailed_Summary_12_Oct_2026 1.docx"},
+            {name:"FDE_Central_Biweekly_Connect_Topic_Wise_FAQs_12_Oct_2026.docx"}
+          ]}
+        ],
+        decisions:[
+          "Integrate the functional-analysis capability into StarForge rather than keep it as an isolated tool; AI Studio is a second intended destination.",
+          "Use the functional analysis to improve early discovery, process understanding, customer questions and estimation — not as end-to-end solution design.",
+          "Keep the CSI audit model focused on selected business-critical fields, not every available field.",
+          "Position the CTP/ATP workbench around usability and consolidation, with transparent acknowledgement of overlap with standard ERP.",
+          "Keep BOM automation on structured JSON as the primary input, with the PDF as the supporting engineering drawing."
+        ],
+        followups:[]
+      };
     })()
   ]
 };
